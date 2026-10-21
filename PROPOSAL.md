@@ -99,11 +99,11 @@ Academic department heads and university teachers face severe scheduling frictio
 
 ### Entity Table
 
-| Entity              | Main attributes                                                                                                                                                                                                                                                                                                                                                                           | Relations                                                                      |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| **User**      | `id` (UUID), `name`, `email`, `password` (hashed), `role` (`ADMIN` \| `TEACHER`), `createdAt`, `updatedAt`                                                                                                                                                                                                                                                              | Has many `Session` records (as creator)                                      |
-| **Classroom** | `id` (UUID), `name` (e.g., "Room A-420", "Room J-602"), `building` (e.g., "Building A"), `capacity` (Int), `createdAt`, `updatedAt`                                                                                                                                                                                                                                           | Has many `Session` records                                                   |
-| **Course**    | `id` (UUID), `code` (e.g., "CS301"), `name` (e.g., "Internet Programming"), `lecturer` (e.g., "Mr. CHUN Thavorac"), `semester` (`SEMESTER_1` \| `SEMESTER_2` \| `WHOLE_YEAR`), `createdAt`, `updatedAt`                                                                                                                                                               | Has many `Session` records                                                   |
+| Entity        | Main attributes                                                                                                                                                                                                                                                                                                                                     | Relations                                                                |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **User**      | `id` (UUID), `name`, `email`, `password` (hashed), `role` (`ADMIN` \| `TEACHER`), `createdAt`, `updatedAt`                                                                                                                                                                                                                                          | Has many `Session` records (as creator)                                  |
+| **Classroom** | `id` (UUID), `name` (e.g., "Room A-420", "Room J-602"), `building` (e.g., "Building A"), `capacity` (Int), `createdAt`, `updatedAt`                                                                                                                                                                                                                 | Has many `Session` records                                               |
+| **Course**    | `id` (UUID), `code` (e.g., "CS301"), `name` (e.g., "Internet Programming"), `lecturer` (e.g., "Mr. CHUN Thavorac"), `semester` (`SEMESTER_1` \| `SEMESTER_2`), `createdAt`, `updatedAt`                                                                                                                                                             | Has many `Session` records                                               |
 | **Session**   | `id` (UUID), `type` (`FIXED` \| `MAKEUP`), `status` (`CONFIRMED` \| `MISSED` \| `CANCELLED`), `studentGroup` (e.g., "I3-SE"), `academicYear` (e.g., "2026-2027"), `deliveryMode` ("Lecture" \| "Practical"), `date` (Date), `slotNumber` (Int: 1..8), `reason` (Text, optional), `courseId`, `classroomId`, `createdById`, `createdAt`, `updatedAt` | Belongs to `Course`, belongs to `Classroom`, belongs to `User` (creator) |
 
 ### Entity-Relationship Model (ERM / ERD)
@@ -138,7 +138,7 @@ erDiagram
         string code UK "e.g. CS301"
         string name "e.g. Internet Programming"
         string lecturer "e.g. Mr. CHUN Thavorac"
-        enum semester "SEMESTER_1 | SEMESTER_2 | WHOLE_YEAR"
+        enum semester "SEMESTER_1 | SEMESTER_2"
         datetime createdAt
         datetime updatedAt
     }
@@ -186,16 +186,16 @@ erDiagram
 
 Rather than storing redundant start and end time strings in the database, the system normalizes time into fixed daily slot periods matching the official timetable:
 
-|   Slot Number   | Time Interval |   Period Label   | Session Shift |
-| :--------------: | :------------: | :---------------: | :-----------: |
-| **Slot 1** | 07:00 – 07:55 |  `7h00 - 7h55`  |    Morning    |
-| **Slot 2** | 08:00 – 08:55 |  `8h00 - 8h55`  |    Morning    |
-| **Slot 3** | 09:10 – 10:05 | `9h10 - 10h05` |    Morning    |
-| **Slot 4** | 10:10 – 11:05 | `10h10 - 11h05` |    Morning    |
-| **Slot 5** | 13:00 – 13:55 | `13h00 - 13h55` |   Afternoon   |
-| **Slot 6** | 14:00 – 14:55 | `14h00 - 14h55` |   Afternoon   |
-| **Slot 7** | 15:10 – 16:05 | `15h10 - 16h05` |   Afternoon   |
-| **Slot 8** | 16:10 – 17:05 | `16h10 - 17h05` |   Afternoon   |
+| Slot Number | Time Interval |  Period Label   | Session Shift |
+| :---------: | :-----------: | :-------------: | :-----------: |
+| **Slot 1**  | 07:00 – 07:55 |  `7h00 - 7h55`  |    Morning    |
+| **Slot 2**  | 08:00 – 08:55 |  `8h00 - 8h55`  |    Morning    |
+| **Slot 3**  | 09:10 – 10:05 | `9h10 - 10h05`  |    Morning    |
+| **Slot 4**  | 10:10 – 11:05 | `10h10 - 11h05` |    Morning    |
+| **Slot 5**  | 13:00 – 13:55 | `13h00 - 13h55` |   Afternoon   |
+| **Slot 6**  | 14:00 – 14:55 | `14h00 - 14h55` |   Afternoon   |
+| **Slot 7**  | 15:10 – 16:05 | `15h10 - 16h05` |   Afternoon   |
+| **Slot 8**  | 16:10 – 17:05 | `16h10 - 17h05` |   Afternoon   |
 
 ---
 
@@ -263,7 +263,6 @@ enum SessionStatus {
 enum Semester {
   SEMESTER_1
   SEMESTER_2
-  WHOLE_YEAR
 }
 
 model User {
@@ -393,42 +392,3 @@ graph TB
 ```
 
 ---
-
-### E. Architectural Decision Record (ADR-001)
-
-- **Title:** ADR-001: Normalized Slot-Based Modular Monolith with Prisma ORM
-- **Status:** **Accepted**
-- **Context:** The system requires atomic conflict detection across classrooms and student groups during fixed schedule generation and makeup class booking. Rather than storing arbitrary, redundant start/end time strings, the academic timetable operates on 8 discrete periods per day.
-- **Decision:** Build a modular monolith in **NestJS** with **Prisma ORM** over **PostgreSQL**. Normalize session times into discrete slot numbers (`1..8`), enforcing room conflict prevention via an atomic database compound unique index (`[classroomId, date, slotNumber]`).
-- **Consequences:**
-  - *Positive:* Eliminates redundant time strings; converts complex overlap math into instant $O(1)$ index lookups; avoids database corruption with native PostgreSQL unique constraints; simplifies frontend 8 $\times$ 6 grid rendering.
-  - *Negative:* Non-standard period lengths outside the 8 fixed slots would require schema modification; acceptable because we strictly adhere to the 8 standard periods.
-
----
-
-### F. Capacity Estimation & Back-of-the-Envelope Calculations
-
-- **Institutional Scale:**
-  - 100 Classrooms across campus.
-  - 500 Courses per semester.
-  - 2,000 Active sessions per week (~20,000 sessions/semester).
-  - 300 Teachers & department staff members.
-- **Throughput & QPS:**
-  - Average weekday queries: $\approx 15,000$ requests/day.
-  - Average QPS: $\frac{15,000}{86,400} \approx 0.17\text{ QPS}$.
-  - Peak QPS ($5\times$ peak multiplier): $\approx 0.85\text{ QPS}$ (well below single-node NestJS capacity of 1,000+ QPS).
-- **Storage Footprint:**
-  - Session record size: $\approx 250\text{ bytes}$ (further reduced by replacing time strings with integer slot indices).
-  - Annual session storage: $20,000 \times 2\text{ semesters} \times 250\text{ B} \approx 10\text{ MB / year}$.
-  - Over 5 years, the entire dataset requires $< 100\text{ MB}$, fitting comfortably inside minimal container storage./
-
----
-
-### G. Milestone M0 Design Reflection
-
-> We did not include **Google/Outlook Calendar sync** and **automated reschedule suggestions** .
->
-> **Why?**
->
-> * **Reduces external risks:** Third-party APIs and OAuth flows can fail or require internet access during a live evaluation.
-> * **Focuses on core value:** It let us focus 100% on what matters most: reliable room availability search, role permissions, and zero double-booking (for rooms and student groups).
