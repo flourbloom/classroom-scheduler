@@ -18,13 +18,16 @@ Academic department heads and university teachers face severe scheduling frictio
 ## Users and roles
 
 - **Admin (Head of Department / Academic Coordinator):**
-  - Manages the institutional catalog of classrooms and courses
-  - sets up the initial fixed semester master schedule for each student group across the 8 standardized daily periods,and possesses global administrative oversight to modify, resolve, or reassign any scheduled session.
+  - Creates and provisions **Teacher accounts** (name, institutional email, initial password) and manages user roles
+  - Manages the institutional catalog of classrooms and courses, assigning each course to its designated faculty teacher
+  - Sets up the initial fixed semester master schedule for each student group across the 8 standardized daily periods
+  - Possesses global administrative oversight to modify, resolve, or reassign any scheduled session across the department
 - **Teacher (Faculty Instructor):**
-  - Views the master semester schedule for any student group or classroom
-  - flags their own upcoming regular classes as missed when unavailable
-  - checks real-time classroom slot availability across campus
-  - books/manages makeup sessions directly
+  - Authenticates securely using admin-provisioned email and password credentials
+  - Views the master semester schedule for any student group/classroom and accesses a personalized "My Teaching Schedule" & "My Courses" view
+  - Flags their own upcoming regular classes as missed when unavailable (strictly isolated: cannot edit, flag, or alter classes taught by other instructors)
+  - Checks real-time classroom slot availability across campus
+  - Books and manages makeup sessions for their missed classes
 
 ![1792517833193](image/PROPOSAL/1792517833193.png)
 
@@ -40,6 +43,7 @@ Academic department heads and university teachers face severe scheduling frictio
 2. **As a Teacher**, I want to flag one of my scheduled classes as "Missed", have its classroom slot immediately released, and have the class card drop into a pending makeup queue at the bottom of the page, so that I can track my missed classes and reschedule them into an open slot this week or search for an available room on a future date.
 
    - *Accepted when:* Clicking a scheduled class card flips it to reveal a "Flag as Missed" confirmation action; confirming updates the session to `status = MISSED`, immediately releasing that classroom slot for other teachers on that specific date.
+   - *Accepted when:* **Ownership isolation:** A teacher can only flag sessions for courses assigned to them (`session.course.teacherId == currentUser.id`); attempts to flag or modify another teacher's class return HTTP `403 Forbidden`.
    - *Accepted when:* Flagged missed classes animate and drop into a visible "Pending Missed Classes" tray at the bottom of the page, displaying the count of missed sessions needing makeup.
    - *Accepted when:* A missed class card in the bottom tray can be flipped to choose between two rescheduling paths:
      1. **This Week:** Selecting an empty slot directly on the weekly timetable grid to place the makeup class.
@@ -52,25 +56,29 @@ Academic department heads and university teachers face severe scheduling frictio
    - *Accepted when:* The Admin can create fixed sessions (`type = FIXED`) linking course, classroom, student group, delivery mode (`Lecture` or `Practical`), date, and `slotNumber`.
    - *Accepted when:* The system rejects any session that collides with an already scheduled classroom or student group with HTTP `409 Conflict`.
    - *Accepted when:* Endpoints to create or edit fixed semester sessions are protected by role guards; non-admin users attempting access receive HTTP `403 Forbidden`.
-4. **As an Admin**, I want to create, update, and manage classrooms (name, building, capacity) and courses (code, name, lecturer), so that the system catalog accurately reflects the institution's facilities and curriculum.
+4. **As an Admin**, I want to create and manage Teacher accounts (with name, institutional email, and password) and manage classrooms and courses (linking each course to its designated teacher), so that the faculty roster and curriculum catalog are fully configured.
 
+   - *Accepted when:* Admin can provision new teacher accounts (`role = TEACHER`, email, hashed password); duplicate emails return HTTP `409 Conflict`.
+   - *Accepted when:* Courses are assigned to a valid registered teacher (`teacherId`), establishing the faculty ownership relation.
    - *Accepted when:* Classrooms cannot have duplicate room names within the same building.
-   - *Accepted when:* Deleting a classroom or course with active future sessions is safely blocked with referential integrity.
-5. **As a Teacher or Admin**, I want to view the timetable formatted as an 8-period by 6-day (Monday–Saturday) interactive grid filtered by student group or classroom, with container/card-style class sessions showing subject, teacher name, room, and delivery mode, so that I can easily inspect academic commitments matching the schedule format.
+   - *Accepted when:* Deleting a classroom, course, or teacher with active scheduled sessions is safely blocked with referential integrity.
+5. **As a Teacher or Admin**, I want to view the timetable formatted as an 8-period by 6-day (Monday–Saturday) interactive grid filtered by student group, classroom, or personal faculty schedule, with container/card-style class sessions showing subject, teacher name, room, and delivery mode, so that I can easily inspect academic commitments.
 
-   - *Accepted when:* Grid cells render each class session in a card view displaying course name, lecturer, classroom, and delivery mode badge (`Lecture` or `Practical`), with distinct color accents per course matching the schedule layout.
+   - *Accepted when:* Grid cells render each class session in a card view displaying course name, teacher name, classroom, and delivery mode badge (`Lecture` or `Practical`), with distinct color accents per course matching the schedule layout.
+   - *Accepted when:* Teachers can toggle a "My Schedule" filter to isolate sessions for courses they personally teach.
    - *Accepted when:* The grid renders each period with its standardized time label (e.g., Slot 1: 07h00–07h55) across the active week.
-   - *Accepted when:* Clicking an active class card flips the card (3D flip effect) to reveal details and actions (such as flagging as missed for teachers).
+   - *Accepted when:* Clicking an active class card flips the card to reveal details and actions; action buttons ("Flag as Missed", "Reschedule") are strictly enabled only for the logged-in teacher's own sessions.
    - *Accepted when:* Missed classes, fixed classes, and makeup classes are visually distinguished.
 6. **As a Teacher**, I want to edit or cancel a makeup session that I previously booked, so that unneeded rooms are promptly released if makeup plans change.
 
-   - *Accepted when:* Ownership is strictly enforced; a teacher cannot edit or cancel makeup sessions scheduled by another teacher (returns HTTP `403 Forbidden`).
+   - *Accepted when:* Ownership is strictly enforced; a teacher cannot edit or cancel sessions scheduled by or assigned to another teacher (returns HTTP `403 Forbidden`).
    - *Accepted when:* An Admin has override authority to cancel or reschedule any session for emergency room management.
    - *Accepted when:* Cancellation updates the session status to `CANCELLED`, immediately reopening the slot for availability queries.
-7. **As a prospective or registered user**, I want to sign up and log in securely with my email and password, so that I receive a signed JWT token authorizing my actions based on my role (`ADMIN` or `TEACHER`).
+7. **As a Teacher or Admin**, I want to log in securely with my email and password (using admin-provisioned or admin credentials), so that I receive a signed JWT token authorizing my actions based on my role (`ADMIN` or `TEACHER`) and scoping my editing privileges strictly to my own sessions.
 
    - *Accepted when:* Passwords are encrypted with `bcrypt` (work factor $\ge 10$) or `argon2` before persistence.
-   - *Accepted when:* Valid credentials return a signed JWT payload containing `userId` and `role`; invalid credentials return HTTP `401 Unauthorized`.
+   - *Accepted when:* Valid credentials return a signed JWT payload containing `userId`, `name`, and `role`; invalid credentials return HTTP `401 Unauthorized`.
+   - *Accepted when:* Logged-in teachers have full visibility over timetables, but editing mutations are strictly locked to their own sessions.
 8. **As a Teacher or Admin (Stretch Feature)**, I want to filter, search, and paginate through scheduled sessions and room availability by building, capacity, and date, so that large semester datasets are navigable without client performance lag.
 
    - *Accepted when:* Querying `/sessions?page=1&limit=10&studentGroup=I3-SE&type=MAKEUP` returns paginated items alongside total count and page metadata.
@@ -101,15 +109,16 @@ Academic department heads and university teachers face severe scheduling frictio
 
 | Entity        | Main attributes                                                                                                                                                                                                                                                                                                                                     | Relations                                                                |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| **User**      | `id` (UUID), `name`, `email`, `password` (hashed), `role` (`ADMIN` \| `TEACHER`), `createdAt`, `updatedAt`                                                                                                                                                                                                                                          | Has many `Session` records (as creator)                                  |
+| **User**      | `id` (UUID), `name`, `email`, `password` (hashed), `role` (`ADMIN` \| `TEACHER`), `createdAt`, `updatedAt`                                                                                                                                                                                                                                          | Has many `Course` records (as assigned teacher), has many `Session` records (as creator) |
 | **Classroom** | `id` (UUID), `name` (e.g., "Room A-420", "Room J-602"), `building` (e.g., "Building A"), `capacity` (Int), `createdAt`, `updatedAt`                                                                                                                                                                                                                 | Has many `Session` records                                               |
-| **Course**    | `id` (UUID), `code` (e.g., "CS301"), `name` (e.g., "Internet Programming"), `lecturer` (e.g., "Mr. CHUN Thavorac"), `semester` (`SEMESTER_1` \| `SEMESTER_2`), `createdAt`, `updatedAt`                                                                                                                                                             | Has many `Session` records                                               |
-| **Session**   | `id` (UUID), `type` (`FIXED` \| `MAKEUP`), `status` (`CONFIRMED` \| `MISSED` \| `CANCELLED`), `studentGroup` (e.g., "I3-SE"), `academicYear` (e.g., "2026-2027"), `deliveryMode` ("Lecture" \| "Practical"), `date` (Date), `slotNumber` (Int: 1..8), `reason` (Text, optional), `courseId`, `classroomId`, `createdById`, `createdAt`, `updatedAt` | Belongs to `Course`, belongs to `Classroom`, belongs to `User` (creator) |
+| **Course**    | `id` (UUID), `code` (e.g., "CS301"), `name` (e.g., "Internet Programming"), `teacherId` (UUID, FK to `User`), `semester` (`SEMESTER_1` \| `SEMESTER_2`), `createdAt`, `updatedAt`                                                                                                                                                                 | Belongs to `User` (assigned teacher), has many `Session` records        |
+| **Session**   | `id` (UUID), `type` (`FIXED` \| `MAKEUP`), `status` (`CONFIRMED` \| `MISSED` \| `CANCELLED`), `studentGroup` (e.g., "I3-SE"), `academicYear` (e.g., "2026-2027"), `deliveryMode` ("Lecture" \| "Practical"), `date` (Date), `slotNumber` (Int: 1..8), `reason` (Text, optional), `courseId`, `classroomId`, `createdById`, `createdAt`, `updatedAt` | Belongs to `Course` (and its teacher), belongs to `Classroom`, belongs to `User` (creator) |
 
 ### Entity-Relationship Model (ERM / ERD)
 
 ```mermaid
 erDiagram
+    USER ||--o{ COURSE : "teaches / assigned to (1:N)"
     USER ||--o{ SESSION : "creates / books (1:N)"
     CLASSROOM ||--o{ SESSION : "hosts (1:N)"
     COURSE ||--o{ SESSION : "schedules (1:N)"
@@ -137,7 +146,7 @@ erDiagram
         uuid id PK
         string code UK "e.g. CS301"
         string name "e.g. Internet Programming"
-        string lecturer "e.g. Mr. CHUN Thavorac"
+        uuid teacherId FK "User (Teacher)"
         enum semester "SEMESTER_1 | SEMESTER_2"
         datetime createdAt
         datetime updatedAt
@@ -225,8 +234,10 @@ Rather than storing redundant start and end time strings in the database, the sy
    When a teacher flags a session as `status = MISSED`, its active occupancy on that `(classroomId, date, slotNumber)` is released, immediately making that classroom available for another teacher's makeup session.
 4. **Role & Ownership Enforcement:**
 
-   - `ADMIN`: Global permissions to create, update, or cancel any session (`FIXED` or `MAKEUP`).
-   - `TEACHER`: Can flag their own scheduled class as `MISSED`; can create `MAKEUP` sessions; can only update or cancel makeup sessions where `session.createdById == currentUser.id`.
+   - `ADMIN`: Global permissions to provision teacher user accounts, manage course-to-teacher assignments, create fixed semester timetables, and update, cancel, or reassign any session across the system.
+   - `TEACHER`: Authenticates securely using credentials provisioned by the admin; has read access to institutional timetables and a personalized view of their assigned courses and schedule; **strictly scoped write/edit permissions**:
+     - A teacher can **only flag as missed, reschedule, edit, or cancel sessions belonging to their assigned courses** (`session.course.teacherId == currentUser.id`) or makeup sessions they booked (`session.createdById == currentUser.id`).
+     - Modifying, flagging, or deleting sessions belonging to another teacher returns HTTP `403 Forbidden` (`ForbiddenException`).
 
 ---
 
@@ -274,6 +285,9 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  // 1:N Relation: User (Teacher) -> Courses assigned to this instructor
+  courses   Course[]
+
   // 1:N Relation: User -> Sessions (Makeup bookings or scheduled by user)
   sessions  Session[]
 
@@ -299,8 +313,12 @@ model Course {
   id        String    @id @default(uuid())
   code      String    @unique // e.g. "CS301"
   name      String    // e.g. "Internet Programming"
-  lecturer  String    // e.g. "Mr. CHUN Thavorac"
   semester  Semester  @default(SEMESTER_1)
+  
+  // Foreign key to assigned Teacher (User)
+  teacherId String
+  teacher   User      @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
