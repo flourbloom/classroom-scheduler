@@ -42,10 +42,10 @@ Academic department heads and university teachers face severe scheduling frictio
    - *Accepted when:* Invalid slot numbers (outside 1–8) or past dates return HTTP `400 Bad Request`.
 2. **As a Teacher**, I want to flag one of my scheduled classes as "Missed", have its classroom slot immediately released, and have the class card drop into a pending makeup queue at the bottom of the page, so that I can track my missed classes and reschedule them into an open slot this week or search for an available room on a future date.
 
-   - *Accepted when:* Clicking a scheduled class card flips it to reveal a "Flag as Missed" confirmation action; confirming updates the session to `status = MISSED`, immediately releasing that classroom slot for other teachers on that specific date.
+   - *Accepted when:* Clicking a scheduled class card opens the session action controls/modal to reveal a "Flag as Missed" confirmation action; confirming updates the session to `status = MISSED`, immediately releasing that classroom slot for other teachers on that specific date. *(Core functional modal/button state transitions are built first; 3D card flip transitions and drag-to-tray physics are progressive visual polish added after core stories work).*
    - *Accepted when:* **Ownership isolation:** A teacher can only flag sessions for courses assigned to them (`session.course.teacherId == currentUser.id`); attempts to flag or modify another teacher's class return HTTP `403 Forbidden`.
-   - *Accepted when:* Flagged missed classes animate and drop into a visible "Pending Missed Classes" tray at the bottom of the page, displaying the count of missed sessions needing makeup.
-   - *Accepted when:* A missed class card in the bottom tray can be flipped to choose between two rescheduling paths:
+   - *Accepted when:* Flagged missed classes drop into a visible "Pending Missed Classes" tray at the bottom of the page, displaying the count of missed sessions needing makeup (motion animation kept as polish after functional queue updates).
+   - *Accepted when:* A missed class card in the bottom tray can be selected to choose between two rescheduling paths:
      1. **This Week:** Selecting an empty slot directly on the weekly timetable grid to place the makeup class.
      2. **Future Date:** Searching by date and slot number to find an available classroom beyond the current week.
    - *Accepted when:* The makeup booking payload validates `courseId`, `classroomId`, `studentGroup`, `date`, `slotNumber`, and a makeup `reason`.
@@ -61,13 +61,14 @@ Academic department heads and university teachers face severe scheduling frictio
    - *Accepted when:* Admin can provision new teacher accounts (`role = TEACHER`, email, hashed password); duplicate emails return HTTP `409 Conflict`.
    - *Accepted when:* Courses are assigned to a valid registered teacher (`teacherId`), establishing the faculty ownership relation.
    - *Accepted when:* Classrooms cannot have duplicate room names within the same building.
+   - *Accepted when:* Courses enforce a composite unique key on `(code, semester)` (`@@unique([code, semester])`), preventing duplicate course codes in the same semester while permitting the same course in different semesters.
    - *Accepted when:* Deleting a classroom, course, or teacher with active scheduled sessions is safely blocked with referential integrity.
 5. **As a Teacher or Admin**, I want to view the timetable formatted as an 8-period by 6-day (Monday–Saturday) interactive grid filtered by student group, classroom, or personal faculty schedule, with container/card-style class sessions showing subject, teacher name, room, and delivery mode, so that I can easily inspect academic commitments.
 
    - *Accepted when:* Grid cells render each class session in a card view displaying course name, teacher name, classroom, and delivery mode badge (`Lecture` or `Practical`), with distinct color accents per course matching the schedule layout.
    - *Accepted when:* Teachers can toggle a "My Schedule" filter to isolate sessions for courses they personally teach.
    - *Accepted when:* The grid renders each period with its standardized time label (e.g., Slot 1: 07h00–07h55) across the active week.
-   - *Accepted when:* Clicking an active class card flips the card to reveal details and actions; action buttons ("Flag as Missed", "Reschedule") are strictly enabled only for the logged-in teacher's own sessions.
+   - *Accepted when:* Clicking an active class card opens details and contextual action controls (with 3D card flip animation kept as polish after the stories work); action buttons ("Flag as Missed", "Reschedule") are strictly enabled only for the logged-in teacher's own sessions.
    - *Accepted when:* Missed classes, fixed classes, and makeup classes are visually distinguished.
 6. **As a Teacher**, I want to edit or cancel a makeup session that I previously booked, so that unneeded rooms are promptly released if makeup plans change.
 
@@ -79,7 +80,7 @@ Academic department heads and university teachers face severe scheduling frictio
    - *Accepted when:* Passwords are encrypted with `bcrypt` (work factor $\ge 10$) or `argon2` before persistence.
    - *Accepted when:* Valid credentials return a signed JWT payload containing `userId`, `name`, and `role`; invalid credentials return HTTP `401 Unauthorized`.
    - *Accepted when:* Logged-in teachers have full visibility over timetables, but editing mutations are strictly locked to their own sessions.
-8. **As a Teacher or Admin (Stretch Feature)**, I want to filter, search, and paginate through scheduled sessions and room availability by building, capacity, and date, so that large semester datasets are navigable without client performance lag.
+8. **As a Teacher or Admin (Chosen Stretch Feature — Mandatory for M4)**, I want to filter, search, and paginate through scheduled sessions and room availability by building, capacity, and date, so that large semester datasets are navigable without client performance lag.
 
    - *Accepted when:* Querying `/sessions?page=1&limit=10&studentGroup=I3-SE&type=MAKEUP` returns paginated items alongside total count and page metadata.
    - *Accepted when:* Room availability search supports dynamic filters for building and capacity thresholds with paginated results.
@@ -90,16 +91,32 @@ Academic department heads and university teachers face severe scheduling frictio
 
 - **Must have:**
   - **Story 1:** Classroom availability lookup by date and slot number (1–8).
-  - **Story 2:** Interactive card flip to flag missed classes, drop into bottom makeup queue, and reschedule (within the week or via future date/slot search).
+  - **Story 2:** Flagging missed classes, immediate room release, bottom makeup queue, and rescheduling (within the week or via future date/slot search).
   - **Story 3:** Admin creation of fixed semester schedules across the 8 daily slots.
-  - **Story 4:** Admin CRUD management for classrooms and courses.
-  - **Story 5:** Interactive 8 $\times$ 6 weekly timetable grid with flippable class cards matching the schedule layout.
+  - **Story 4:** Admin CRUD management for classrooms and courses (linking courses to assigned teachers).
+  - **Story 5:** Interactive 8 $\times$ 6 weekly timetable grid with class cards matching the schedule layout.
   - **Story 6:** Ownership-guarded editing and cancellation of makeup sessions.
   - **Story 7:** User authentication (registration, login, password hashing, JWT guards, role checks).
-- **Nice to have:**
-  - **Story 8 (Stretch Feature):** Multi-criteria search, filtering, and pagination for sessions and room availability.
-  - Exporting schedule data to PDF for student and faculty.
+  - **Story 8 (Chosen Stretch Feature):** Multi-criteria search, filtering, and pagination for sessions and room availability (mandatory for M4).
+- **Nice to have (Post-M4 / Future Polish):**
+  - Exporting schedule data to PDF for students and faculty.
   - Email/push notification dispatches when an admin overrides or moves a scheduled class.
+  - Automated recurring makeup schedule suggestion bots and external calendar synchronization (Google Calendar / Outlook iCal sync).
+
+> [!TIP]
+> **Implementation Phasing (Core Stories vs. Animation Polish):**
+> As recommended, all core user stories (Story 1 through 8) prioritize functional correctness, data integrity, and API reliability first (e.g., standard modals/controls for class details, reactive Pinia queue updates). Advanced visual polish—specifically the **3D card flip CSS perspective transitions** and **drag-to-tray motion animations**—are kept as progressive enhancements implemented after the end-to-end functional flows and acceptance criteria pass all tests.
+
+### Design Reflection: Which story did you cut from the MVP, and why?
+
+> **Question:** Which story did you cut from the MVP, and why?
+> **Answer:**
+> We cut **automated recurring makeup schedule suggestion bots and external calendar synchronization (Google Calendar / Outlook iCal sync)** from the initial MVP scope.
+>
+> **Why it was cut:**
+> While syncing sessions with third-party calendars (Google Calendar, Microsoft Outlook) and automated algorithm-driven makeup slot recommendations would be convenient for faculty, implementing OAuth 2.0 token refresh lifecycles and relying on external cloud APIs introduces external failure vectors and unnecessary complexity during offline testability and live code defense evaluations.
+>
+> Cutting this allows us to direct 100% of our engineering effort toward the core academic scheduling engine: rock-solid conflict detection algorithms (preventing classroom double-booking via PostgreSQL partial unique index `WHERE status = 'CONFIRMED'` and student group collisions), instant room release upon flagging missed classes, strict ownership and role-based access control (Admin fixed setup vs. Teacher makeup booking), and robust PostgreSQL relational integrity. *(See full architectural reflection in [Milestone 0 Design Reflection](#milestone-0-design-reflection) at the end of this document).*
 
 ---
 
@@ -107,12 +124,12 @@ Academic department heads and university teachers face severe scheduling frictio
 
 ### Entity Table
 
-| Entity        | Main attributes                                                                                                                                                                                                                                                                                                                                     | Relations                                                                |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| **User**      | `id` (UUID), `name`, `email`, `password` (hashed), `role` (`ADMIN` \| `TEACHER`), `createdAt`, `updatedAt`                                                                                                                                                                                                                                          | Has many `Course` records (as assigned teacher), has many `Session` records (as creator) |
-| **Classroom** | `id` (UUID), `name` (e.g., "Room A-420", "Room J-602"), `building` (e.g., "Building A"), `capacity` (Int), `createdAt`, `updatedAt`                                                                                                                                                                                                                 | Has many `Session` records                                               |
-| **Course**    | `id` (UUID), `code` (e.g., "CS301"), `name` (e.g., "Internet Programming"), `teacherId` (UUID, FK to `User`), `semester` (`SEMESTER_1` \| `SEMESTER_2`), `createdAt`, `updatedAt`                                                                                                                                                                 | Belongs to `User` (assigned teacher), has many `Session` records        |
-| **Session**   | `id` (UUID), `type` (`FIXED` \| `MAKEUP`), `status` (`CONFIRMED` \| `MISSED` \| `CANCELLED`), `studentGroup` (e.g., "I3-SE"), `academicYear` (e.g., "2026-2027"), `deliveryMode` ("Lecture" \| "Practical"), `date` (Date), `slotNumber` (Int: 1..8), `reason` (Text, optional), `courseId`, `classroomId`, `createdById`, `createdAt`, `updatedAt` | Belongs to `Course` (and its teacher), belongs to `Classroom`, belongs to `User` (creator) |
+| Entity              | Main attributes                                                                                                                                                                                                                                                                                                                                                                           | Relations                                                                                                          |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **User**      | `id` (UUID), `name`, `email`, `password` (hashed), `role` (`ADMIN` \| `TEACHER`), `createdAt`, `updatedAt`                                                                                                                                                                                                                                                              | Has many `Course` records (as assigned teacher), has many `Session` records (as creator)                       |
+| **Classroom** | `id` (UUID), `name` (e.g., "Room A-420", "Room J-602"), `building` (e.g., "Building A"), `capacity` (Int), `createdAt`, `updatedAt`                                                                                                                                                                                                                                           | Has many `Session` records                                                                                       |
+| **Course**    | `id` (UUID), `code` (e.g., "CS301"), `name` (e.g., "Internet Programming"), `teacherId` (UUID, FK to `User`), `semester` (`SEMESTER_1` \| `SEMESTER_2`), `createdAt`, `updatedAt`                                                                                                                                                                                     | Belongs to `User` (assigned teacher), has many `Session` records; composite unique key on `(code, semester)` |
+| **Session**   | `id` (UUID), `type` (`FIXED` \| `MAKEUP`), `status` (`CONFIRMED` \| `MISSED` \| `CANCELLED`), `studentGroup` (e.g., "I3-SE"), `academicYear` (e.g., "2026-2027"), `deliveryMode` ("Lecture" \| "Practical"), `date` (Date), `slotNumber` (Int: 1..8), `reason` (Text, optional), `courseId`, `classroomId`, `createdById`, `createdAt`, `updatedAt` | Belongs to `Course` (and its teacher), belongs to `Classroom`, belongs to `User` (creator)                   |
 
 ### Entity-Relationship Model (ERM / ERD)
 
@@ -144,10 +161,10 @@ erDiagram
 
     COURSE {
         uuid id PK
-        string code UK "e.g. CS301"
+        string code "e.g. CS301 (Composite UK with semester)"
         string name "e.g. Internet Programming"
         uuid teacherId FK "User (Teacher)"
-        enum semester "SEMESTER_1 | SEMESTER_2"
+        enum semester "SEMESTER_1 | SEMESTER_2 (Composite UK with code)"
         datetime createdAt
         datetime updatedAt
     }
@@ -179,7 +196,7 @@ erDiagram
 **What it does in this app:**
 
 1. **Dynamic Classroom Availability Search Engine:** Teachers and administrators can search for open classrooms across campus by selecting a target date, slot number (1–8), minimum capacity, and optional building name. The backend executes a fast query filtering out any classroom occupied by an active session (`status = CONFIRMED`) during that slot, displaying results 10 per page with pagination controls.
-2. **Paginated Master & Makeup Schedule Explorer:** A unified schedule directory where users can search sessions by course code, course name, lecturer, student group, or date range, toggle filters between fixed semester classes and makeup classes, and page through hundreds of semester sessions with pagination controls (`page`, `limit`, total pages).
+2. **Paginated Master & Makeup Schedule Explorer:** A unified schedule directory where users can search sessions by course code, course name, teacher name, student group, or date range, toggle filters between fixed semester classes and makeup classes, and page through hundreds of semester sessions with pagination controls (`page`, `limit`, total pages).
 
 ---
 
@@ -195,16 +212,16 @@ erDiagram
 
 Rather than storing redundant start and end time strings in the database, the system normalizes time into fixed daily slot periods matching the official timetable:
 
-| Slot Number | Time Interval |  Period Label   | Session Shift |
-| :---------: | :-----------: | :-------------: | :-----------: |
-| **Slot 1**  | 07:00 – 07:55 |  `7h00 - 7h55`  |    Morning    |
-| **Slot 2**  | 08:00 – 08:55 |  `8h00 - 8h55`  |    Morning    |
-| **Slot 3**  | 09:10 – 10:05 | `9h10 - 10h05`  |    Morning    |
-| **Slot 4**  | 10:10 – 11:05 | `10h10 - 11h05` |    Morning    |
-| **Slot 5**  | 13:00 – 13:55 | `13h00 - 13h55` |   Afternoon   |
-| **Slot 6**  | 14:00 – 14:55 | `14h00 - 14h55` |   Afternoon   |
-| **Slot 7**  | 15:10 – 16:05 | `15h10 - 16h05` |   Afternoon   |
-| **Slot 8**  | 16:10 – 17:05 | `16h10 - 17h05` |   Afternoon   |
+|   Slot Number   | Time Interval |   Period Label   | Session Shift |
+| :--------------: | :------------: | :---------------: | :-----------: |
+| **Slot 1** | 07:00 – 07:55 |  `7h00 - 7h55`  |    Morning    |
+| **Slot 2** | 08:00 – 08:55 |  `8h00 - 8h55`  |    Morning    |
+| **Slot 3** | 09:10 – 10:05 | `9h10 - 10h05` |    Morning    |
+| **Slot 4** | 10:10 – 11:05 | `10h10 - 11h05` |    Morning    |
+| **Slot 5** | 13:00 – 13:55 | `13h00 - 13h55` |   Afternoon   |
+| **Slot 6** | 14:00 – 14:55 | `14h00 - 14h55` |   Afternoon   |
+| **Slot 7** | 15:10 – 16:05 | `15h10 - 16h05` |   Afternoon   |
+| **Slot 8** | 16:10 – 17:05 | `16h10 - 17h05` |   Afternoon   |
 
 ---
 
@@ -217,11 +234,17 @@ Rather than storing redundant start and end time strings in the database, the sy
    \forall S_1, S_2 \in \text{Sessions}, \; (S_1.\text{classroomId} = S_2.\text{classroomId} \;\land\; S_1.\text{date} = S_2.\text{date} \;\land\; S_1.\text{slotNumber} = S_2.\text{slotNumber} \;\land\; S_1.\text{status} = \text{CONFIRMED} \;\land\; S_2.\text{status} = \text{CONFIRMED}) \implies S_1.\text{id} = S_2.\text{id}
    $$
 
-   Enforced at the database engine level via PostgreSQL unique index:
+   Enforced at the database engine level via a **PostgreSQL Partial Unique Index**:
 
-   ```prisma
-   @@unique([classroomId, date, slotNumber])
+   ```sql
+   -- PostgreSQL Migration SQL:
+   CREATE UNIQUE INDEX unique_confirmed_classroom_slot 
+   ON sessions ("classroomId", "date", "slotNumber") 
+   WHERE status = 'CONFIRMED';
    ```
+
+   > **Why a partial unique index is required:** A standard unconditional `@@unique([classroomId, date, slotNumber])` constraint contradicts the rule that a missed class releases the room. Under an unconditional unique index, a `MISSED` or `CANCELLED` row still holds the composite key in PostgreSQL, preventing any teacher from booking a makeup session in that vacated slot. Using a partial unique index with `WHERE status = 'CONFIRMED'` ensures that only active confirmed sessions occupy the key, immediately freeing the room slot for makeup bookings as soon as a session is flagged as `MISSED` or `CANCELLED`.
+   >
 2. **Student Group Non-Overlap Invariant (Service Level):**
    A student group (e.g., "I3-SE") cannot attend two simultaneous classes. The backend verifies:
 
@@ -311,7 +334,7 @@ model Classroom {
 
 model Course {
   id        String    @id @default(uuid())
-  code      String    @unique // e.g. "CS301"
+  code      String    // e.g. "CS301"
   name      String    // e.g. "Internet Programming"
   semester  Semester  @default(SEMESTER_1)
   
@@ -325,6 +348,8 @@ model Course {
   // 1:N Relation: Course -> Sessions
   sessions  Session[]
 
+  // Composite unique key: allows the same course code across different semesters
+  @@unique([code, semester])
   @@map("courses")
 }
 
@@ -359,7 +384,9 @@ model Session {
   updatedAt    DateTime      @updatedAt
 
   // Double-booking prevention & performance indexes
-  @@unique([classroomId, date, slotNumber])
+  // Note: Classroom slot occupancy uniqueness is enforced via PostgreSQL Partial Unique Index in migration:
+  // CREATE UNIQUE INDEX unique_confirmed_classroom_slot ON sessions ("classroomId", "date", "slotNumber") WHERE status = 'CONFIRMED';
+  @@index([classroomId, date, slotNumber])
   @@index([studentGroup, date, slotNumber])
   @@index([date, slotNumber])
   @@map("sessions")
@@ -410,3 +437,24 @@ graph TB
 ```
 
 ---
+
+## Milestone 0 Design Reflection
+
+### Question: Which story did you cut from the MVP, and why?
+
+> **Question:** Which story did you cut from the MVP, and why?
+> **Answer:**
+> We cut **automated recurring makeup schedule suggestion bots and external calendar synchronization (Google Calendar / Outlook iCal sync)** from the initial MVP scope.
+
+#### Architectural Rationale & Design Trade-offs
+
+1. **Eliminating External Failure Vectors during Evaluation:**
+   Synchronizing sessions with third-party calendar providers (Google Calendar, Microsoft Outlook) requires OAuth 2.0 authorization flows, handling refresh token expiration, and maintaining webhook listeners. Relying on external cloud APIs introduces external failure modes (e.g., API rate limits, third-party downtime, or lack of internet connectivity) that could jeopardize automated unit/e2e testing and live 10-minute code defenses.
+2. **Prioritizing Deterministic Relational Scheduling over Speculative Heuristics:**
+   Automated makeup suggestion bots rely on speculative heuristics. Instead, academic coordinators and teachers require deterministic, transparent scheduling. Cutting this feature frees 100% of our engineering effort to focus on rock-solid core business rules:
+
+   - **PostgreSQL Partial Unique Index (`WHERE status = 'CONFIRMED'`):** Enforces at the database level that no classroom has overlapping confirmed bookings, while ensuring that as soon as a teacher flags a class as `MISSED` or `CANCELLED`, the slot is immediately released for makeup sessions.
+   - **Student Group Collision Prevention:** Atomically verifies that a student group cannot be double-booked across concurrent sessions, responding with HTTP `409 Conflict`.
+   - **Strict Teacher Ownership Isolation:** Restricts session modifications to the assigned instructor (`session.course.teacherId == currentUser.id`) or makeup creator (`session.createdById == currentUser.id`), blocking unauthorized edits with HTTP `403 Forbidden`.
+3. **Aligning Scope with Mandatory Milestones (M1–M5):**
+   Per course guidelines, the chosen stretch feature (**Story 8: Dynamic Search, Filter, and Pagination**) is a mandatory requirement to complete Milestone 4 (Week 12). By pruning calendar sync and suggestion bots, Story 8 is safely promoted into the core Must-Have MVP scope without overloading the 14-week timeline. Furthermore, UI animations (3D card flip and drag-to-tray physics) are properly phased as progressive visual polish after core story mechanics are validated.
