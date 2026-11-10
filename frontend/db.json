@@ -1,0 +1,418 @@
+{
+    "users": [
+        {
+        "id": "1",
+        "name": "teacher1",
+        "email": "teacher1@example.com",
+        "password": "teacher1",
+        "role": "Teacher"
+        },
+        {
+        "id": "2",
+        "name": "teacher2",
+        "email": "teacher2@example.com",
+        "password": "teacher2",
+        "role": "Teacher"
+        },
+        {
+        "id": "3",
+        "name": "teacher3",
+        "email": "teacher3@example.com",
+        "password": "teacher3",
+        "role": "Teacher"
+        },
+        {
+        "id": "4",
+        "name": "admin",
+        "email": "admin@example.com",
+        "password": "admin",
+        "role": "Admin"
+        }
+    ],
+
+
+    "classrooms": [
+        {
+            "id": "1",
+            "name": "A-420", 
+            "building": "A",
+            "capacity": 30 
+        },
+        {
+            "id": "2",
+            "name": "J-602", 
+            "building": "J",
+            "capacity": 25 
+        },
+        {
+            "id": "3",
+            "name": "A-109", 
+            "building": "A",
+            "capacity": 60
+        },
+        {
+            "id": "4",
+            "name": "A-417", 
+            "building": "A",
+            "capacity": 30
+        }, 
+        {
+            "id": "5",
+            "name": "J-603", 
+            "building": "J",
+            "capacity": 25 
+        }
+    ],
+
+
+    "courses": [
+        {
+            "id": "1",
+            "code": "IP",
+            "name": "Internet Programming",
+            "teacherId": "1",
+            "semester": "1"
+        },
+        {
+            "id": "2",
+            "code": "NSD",
+            "name": "Networks System Design",
+            "teacherId": "2",
+            "semester": "1"
+        },
+        {
+            "id": "3",
+            "code": "ITPM",
+            "name": "IT Project Management",
+            "teacherId": "3",
+            "semester": "1"
+        },
+        {
+            "id": "4",
+            "code": "SEC",
+            "name": "Software Engineeering Concepts",
+            "teacherId": "3",
+            "semester": "1"
+        },
+        {
+            "id": "5",
+            "code": "SSA",
+            "name": "Software System Architecture",
+            "teacherId": "1",
+            "semester": "1"
+        }
+    ], 
+
+
+
+    "sessions":[
+        {
+            "id": "1",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-09",
+            "slotNumber": 1,
+            "reason": null,
+            "courseId": "1",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "2",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-09",
+            "slotNumber": 2,
+            "reason": null,
+            "courseId": "1",
+            "classroomId": "1",
+            "createdById": "admin"
+        }, 
+        {
+            "id": "3",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-09",
+            "slotNumber": 7,
+            "reason": null,
+            "courseId": "2",
+            "classroomId": "4",
+            "createdById": "admin"
+        },
+        {
+            "id": "4",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-09",
+            "slotNumber": 8,
+            "reason": null,
+            "courseId": "2",
+            "classroomId": "4",
+            "createdById": "admin"
+        },
+        {
+            "id": "5",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-10",
+            "slotNumber": 1,
+            "reason": null,
+            "courseId": "2",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "6",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-10",
+            "slotNumber": 2,
+            "reason": null,
+            "courseId": "2",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "7",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-10",
+            "slotNumber": 5,
+            "reason": null,
+            "courseId": "3",
+            "classroomId": "5",
+            "createdById": "admin"
+        },
+        {
+            "id": "8",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-10",
+            "slotNumber": 6,
+            "reason": null,
+            "courseId": "3",
+            "classroomId": "5",
+            "createdById": "admin"
+        },
+        {
+            "id": "9",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-10",
+            "slotNumber": 7,
+            "reason": null,
+            "courseId": "3",
+            "classroomId": "5",
+            "createdById": "admin"
+        },
+        {
+            "id": "10",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-10",
+            "slotNumber": 8,
+            "reason": null,
+            "courseId": "3",
+            "classroomId": "5",
+            "createdById": "admin"
+        },
+        {
+            "id": "11",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-11",
+            "slotNumber": 1,
+            "reason": null,
+            "courseId": "1",
+            "classroomId": "2",
+            "createdById": "admin"
+        },
+        {
+            "id": "12",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-11",
+            "slotNumber": 2,
+            "reason": null,
+            "courseId": "1",
+            "classroomId": "2",
+            "createdById": "admin"
+        },
+        {
+            "id": "13",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-11",
+            "slotNumber": 3,
+            "reason": null,
+            "courseId": "1",
+            "classroomId": "2",
+            "createdById": "admin"
+        },
+        {
+            "id": "14",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-11",
+            "slotNumber": 4,
+            "reason": null,
+            "courseId": "1",
+            "classroomId": "2",
+            "createdById": "admin"
+        },
+        {
+            "id": "15",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-12",
+            "slotNumber": 1,
+            "reason": null,
+            "courseId": "4",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "16",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-12",
+            "slotNumber": 2,
+            "reason": null,
+            "courseId": "4",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "17",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-12",
+            "slotNumber": 3,
+            "reason": null,
+            "courseId": "4",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "18",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-12",
+            "slotNumber": 4,
+            "reason": null,
+            "courseId": "4",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "19",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-13",
+            "slotNumber": 1,
+            "reason": null,
+            "courseId": "5",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "20",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Lecture", 
+            "date": "2026-11-13",
+            "slotNumber": 2,
+            "reason": null,
+            "courseId": "5",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "21",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-13",
+            "slotNumber": 3,
+            "reason": null,
+            "courseId": "5",
+            "classroomId": "1",
+            "createdById": "admin"
+        },
+        {
+            "id": "22",
+            "type": "FIXED",
+            "status": "CONFIRMED",
+            "studentGroup": "I3-SE",
+            "academic Year": "2026-2027",
+            "deliveryMode": "Practical", 
+            "date": "2026-11-13",
+            "slotNumber": 4,
+            "reason": null,
+            "courseId": "5",
+            "classroomId": "1",
+            "createdById": "admin"
+        }    
+    ]
+}
