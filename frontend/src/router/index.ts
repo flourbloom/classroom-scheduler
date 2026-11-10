@@ -1,24 +1,53 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '@/components/Login.vue'
-import Schedule from '@/components/Schedule.vue'
-import Rooms from '@/components/Rooms.vue'
-import Sessions from '@/components/Sessions.vue'
-import Admin from '@/components/Admin.vue'
+import { useAuthStore } from '@/stores/auth'
+import { Role } from '@/types'
 
+// lazy loading
+const Schedule = () => import('@/components/Schedule.vue')
 
 const routes = [
-  { path: '/schedule', name: 'Schedule', component: Schedule },
-  { path: '/', name: 'Schedule', component: Schedule },
-  { path: '/login', name: 'Login', component: Login },
-  { path: '/rooms', name: 'Rooms', component: Rooms },
-  { path: '/sessions', name: 'Sessions', component: Sessions },
-  { path: '/admin', name: 'Admin', component: Admin },
+  // HOME
+  { path: '/', redirect: '/schedule' },
+  { path: '/schedule', name: 'Schedule', component: () => import('@/components/Schedule.vue') },
+
+  // LOGIN
+  { path: '/login', name: 'Login', component: () => import('@/components/Login.vue') },
+
+  // ROOMS
+  { path: '/rooms', name: 'Rooms', component: () => import('@/components/Rooms.vue') },
+  {
+    path: '/rooms/:id(\\d+)', name: 'RoomDetail', component: () => import('@/components/RoomDetail.vue'),
+    props: true
+  },
+
+  // SESSIONS
+  { path: '/sessions', name: 'Sessions', component: () => import('@/components/Sessions.vue') },
+
+  // ADMIN
+  {
+    path: '/admin', name: 'Admin', component: () => import('@/components/Admin.vue'),
+    meta: { isAdmin: true }
+  },
+
+  //NOT FOUND
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/components/NotFound.vue') }
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
   routes
 })
+export default router
+
+
+// guard
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  if (to.meta.requiresAdmin && authStore.currentUser?.role !== Role.Admin) {
+    return { name: 'Schedule', query: { denied: '1' } }
+  }
+})
+
 
 
 
