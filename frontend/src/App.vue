@@ -1,22 +1,31 @@
 <template>
-  <div>
-    <h1>Routes</h1>
-    <nav>
-      <router-link to="/"></router-link> | 
-      <router-link to="/schedule">Schedule</router-link> | 
-      <router-link to="/login">Login</router-link> | 
-      <router-link to="/sessions">Sessions</router-link> | 
-      <router-link to="/rooms">Rooms</router-link> | 
-      <router-link to="/admin">Admin</router-link> 
-    </nav>
-    <router-view />
+  <div id="app-layout">
+    <TheNavBar />
+    <main class="app-content">
+      <router-view />
+    </main>
   </div>
-  
 </template>
 
-<script>
-export default{
-  name: 'app'
-}
+<script setup lang="ts">
+import TheNavBar from '@/components/TheNavBar.vue'
 </script>
 
+<style scoped>
+#app-layout {
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; 
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+</style>

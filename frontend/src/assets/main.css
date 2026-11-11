@@ -1,0 +1,257 @@
+:root {
+  /* Apple Design  */
+  --apple-primary: #0066cc;               /* Action Blue */
+  --apple-primary-focus: #0071e3;         /* Focus Blue */
+  --apple-primary-on-dark: #2997ff;       /* Sky Link Blue */
+  --apple-ink: #1d1d1f;                   /* Near-Black Ink */
+  --apple-body-on-dark: #ffffff;          /* Body on Dark */
+  --apple-body-muted: #cccccc;            /* Body Muted */
+  --apple-ink-muted-80: #333333;          /* Ink Muted 80 */
+  --apple-ink-muted-48: #7a7a7a;          /* Ink Muted 48 */
+  --apple-divider-soft: #f0f0f0;          /* Divider Soft */
+  --apple-hairline: #e0e0e0;              /* Hairline 1px border */
+  --apple-canvas: #ffffff;                /* Pure White */
+  --apple-canvas-parchment: #f5f5f7;       /* Signature Parchment */
+  --apple-surface-pearl: #fafafc;         /* Pearl Button */
+  --apple-surface-tile-1: #272729;        /* Near-Black Tile 1 */
+  --apple-surface-tile-2: #2a2a2c;        /* Near-Black Tile 2 */
+  --apple-surface-tile-3: #252527;        /* Near-Black Tile 3 */
+  --apple-surface-black: #000000;         /* Pure Black */
+  --apple-surface-chip-translucent: rgba(210, 210, 215, 0.64);
+
+  /* Light Theme Mappings (DESIGN.md) */
+  --color-canvas: var(--apple-canvas);
+  --color-canvas-parchment: var(--apple-canvas-parchment);
+  --color-white: #ffffff;
+  --color-card-bg: #ffffff;
+  --color-shark: #1d1d1f;                 /* Apple ink text */
+  --color-text-secondary: #7a7a7a;        /* Ink muted 48 */
+  --color-athens-gray: #f5f5f7;           /* Apple parchment canvas for sidebars & headers */
+  --color-iron: #e5e5ea;                  /* 1px clean hairline border */
+  --color-lochmara: #0066cc;              /* Apple Action Blue */
+  --color-lochmara-hover: #0071e3;        /* Focus Blue */
+  --color-nav-bg: #000000;                /* Pure black global nav */
+  --color-nav-muted: #a1a1a6;
+  --color-blue-bg: #eef5fc;               /* Soft pearl blue tint */
+  --color-input-bg: #ffffff;
+  --color-input-border: #d2d2d7;
+
+  /* Course Tints (Light Mode) */
+  --color-green: #34c759;
+  --color-red: #ff3b30;
+  --color-violet: #af52de;
+  --color-orange: #ff9500;
+  --color-course-ip-bg: #eef5fc;
+  --color-course-nsd-bg: #f2fcf4;
+  --color-course-itpm-bg: #f9f4fd;
+  --color-course-sec-bg: #fff9f2;
+  --color-course-ssa-bg: #eef6ff;
+}
+
+:root[data-theme="dark"] {
+  /* Dark Theme Mappings (DESIGN.md) */
+  --color-canvas: #1c1c1e;
+  --color-canvas-parchment: #1c1c1e;       /* Deep dark background */
+  --color-white: #272729;                 /* Surface Tile 1 */
+  --color-card-bg: #2a2a2c;               /* Surface Tile 2 (elevated card surface) */
+  --color-shark: #ffffff;                 /* Pure white text on dark */
+  --color-text-secondary: #a1a1a6;        /* Body muted on dark */
+  --color-athens-gray: #1e1e20;           /* Deep parchment sidebar in dark mode */
+  --color-iron: #38383a;                  /* Dark hairline border */
+  --color-lochmara: #2997ff;              /* Sky Link Blue for dark surfaces */
+  --color-lochmara-hover: #52a9ff;
+  --color-nav-bg: #000000;
+  --color-nav-muted: #86868b;
+  --color-blue-bg: rgba(41, 151, 255, 0.16); /* Glowing Sky Link Blue accent */
+  --color-input-bg: #1e1e20;
+  --color-input-border: #38383a;
+
+  /* Course Tints (Dark Mode) */
+  --color-green: #30d158;
+  --color-red: #ff453a;
+  --color-violet: #bf5af2;
+  --color-orange: #ff9f0a;
+  --color-course-ip-bg: rgba(41, 151, 255, 0.14);
+  --color-course-nsd-bg: rgba(48, 209, 88, 0.14);
+  --color-course-itpm-bg: rgba(191, 90, 242, 0.14);
+  --color-course-sec-bg: rgba(255, 159, 10, 0.14);
+  --color-course-ssa-bg: rgba(41, 151, 255, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--color-shark);
+  background-color: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden; 
+  letter-spacing: -0.011em;
+}
+
+#app {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ========================================================
+   Zero-Scroll Dynamic Grid System ("Fits Page at Any Zoom Level")
+   Uses flex and minmax(0, 1fr) grid rows/columns so the layout
+   scales and fits the viewport without triggering scrollbars.
+   ======================================================== */
+.zero-scroll-layout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  min-width: 0;
+  height: calc(100vh - 44px);
+  max-height: calc(100vh - 44px);
+  width: 100%;
+  overflow: hidden;
+}
+
+.zero-scroll-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  padding: 8px 12px;
+  gap: 8px;
+}
+
+.dynamic-grid-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.dynamic-grid-table {
+  flex: 1;
+  display: grid;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  border: 1px solid var(--color-iron);
+  border-radius: 2px;
+  overflow: hidden;
+  grid-template-rows: auto repeat(8, minmax(0, 1fr));
+}
+
+.dynamic-grid-header {
+  display: grid;
+  grid-template-columns: minmax(70px, 85px) repeat(6, minmax(0, 1fr));
+  background-color: var(--color-athens-gray);
+  border-bottom: 1px solid var(--color-iron);
+  min-height: 0;
+}
+
+.dynamic-grid-row {
+  display: grid;
+  grid-template-columns: minmax(70px, 85px) repeat(6, minmax(0, 1fr));
+  min-height: 0;
+  min-width: 0;
+  border-bottom: 1px solid var(--color-iron);
+}
+
+.dynamic-grid-row:last-child {
+  border-bottom: none;
+}
+
+.dynamic-grid-cell {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ========================================================
+   3D Card Flip System
+   ======================================================== */
+.card-flip-scene {
+  perspective: 1000px;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.card-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.card-flip-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-flip-front,
+.card-flip-back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.card-flip-back {
+  transform: rotateY(180deg);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* ========================================================
+   Brand Logo & Dark Mode Styling
+   ======================================================== */
+.brand-mark,
+.top-bar .brand-mark,
+.auth-brand .brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  transition: filter 0.2s ease;
+}
+
+/* On the permanently black navbar, the logo is ALWAYS crisp white */
+.app-nav .brand-logo {
+  filter: invert(1) brightness(2) !important;
+}
+
+/* In the login card, invert only when dark mode is active */
+:root[data-theme="dark"] .auth-brand .brand-logo {
+  filter: invert(1) brightness(2);
+}
