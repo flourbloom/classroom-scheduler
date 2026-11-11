@@ -3,5 +3,5 @@ import type { Classroom } from '@/types'
 
 export const classroomApi = {
     list: () => request<Classroom[]>('/classrooms'),
-    getById: (id: string | number) => request<Classroom>(`/classroom/${id}`),
+    getById: (id: string | number) => request<Classroom>(`/classrooms/${id}`), // 👈 must be plural
 }
