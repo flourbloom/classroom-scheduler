@@ -29,6 +29,9 @@ const routes = [
     meta: { isAdmin: true }
   },
 
+  // LOADING PREVIEW
+  { path: '/loading', name: 'Loading', component: () => import('@/components/LoadingPage.vue') },
+
   //NOT FOUND
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/components/NotFound.vue') }
 ]
@@ -37,16 +40,15 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
-export default router
-
-
 // guard
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   const authStore = useAuthStore()
-  if (to.meta.requiresAdmin && authStore.currentUser?.role !== Role.Admin) {
+  if (to.meta.isAdmin && authStore.currentUser?.role !== Role.Admin) {
     return { name: 'Schedule', query: { denied: '1' } }
   }
 })
+
+export default router
 
 
 

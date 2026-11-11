@@ -33,16 +33,18 @@
 
 - [X] Wireframes (photo or tool) of the main screens in `docs/`
 - [X] Vue 3 + TypeScript app created with Vite; strict mode on; ESLint passes
-- [ ] At least 4 routes, including a detail page with a route parameter
-- [ ] At least one form with client-side validation
-- [ ] A Pinia store and a service layer calling a mock API (`json-server` or local JSON)
-- [ ] Loading, empty and error states visible
+- [X] At least 4 routes, including a detail page with a route parameter
+- [X] At least one form with client-side validation
+- [X] A Pinia store and a service layer calling a mock API (`json-server` or local JSON)
+- [X] Loading, empty and error states visible
 
 ### Design Reflection
 
 > **Question:** What state lives in the store and what stays inside a component? Why?
 > **Answer:**
-> *[Answer here]*
+> **Store State:** Global domain state that is shared across multiple views or needs to persist during navigation lives in Pinia stores. In ClassroomHub, this includes user authentication session (`useAuthStore`) and the shared catalog of rooms and schedules (`useClassroomsStore`).
+>
+> **Component State:** Transient UI state strictly local to one component stays inside the component using Vue's local reactive `ref()` / `reactive()`. In ClassroomHub, this includes the `submitted` flag and inline validation error messages in `BookingForm.vue`, search and building filter inputs, and temporary modal open/close states. Keeping UI state local prevents store bloat, guarantees component encapsulation, and automatically resets state when the component unmounts.
 
 ---
 

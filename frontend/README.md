@@ -23,11 +23,21 @@ TypeScript cannot handle type information for `.vue` imports by default, so we r
 
 See [Vite Configuration Reference](https://vite.dev/config/).
 
-## Project Setup
+## Project Setup & Running the Prototype (M1)
 
 ```sh
+# 1. Install dependencies
 npm install
+
+# 2. Start the mock REST API (Terminal 1)
+npm run api
+
+# 3. Start the Vite development server (Terminal 2)
+npm run dev
 ```
+
+Visit the application in your browser at `http://localhost:5173`.
+- Mock API runs on `http://localhost:3000` (serving `db.json`).
 
 ### Compile and Hot-Reload for Development
 
